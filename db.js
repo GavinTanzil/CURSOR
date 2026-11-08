@@ -40,7 +40,7 @@ db.exec(
                  CHECK (status IN ('Check-In', 'Hadir Penuh')),
     checkin_at   TEXT NOT NULL,
     checkout_at  TEXT,
-    UNIQUE (event_id, nim)               -- NIM sama tidak bisa Check-In 2x di kelas yang sama
+    UNIQUE (event_id, nim)
   );
 
   CREATE INDEX IF NOT EXISTS idx_att_event ON attendances(event_id);
