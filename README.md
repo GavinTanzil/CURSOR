@@ -8,7 +8,7 @@ Dibuat sebagai tugas seleksi calon staff **Website RnD**.
 
 ## Link Repository GitHub
 
-**https://github.com/USERNAME-KAMU/cursor-attendance**
+**https://github.com/GavinTanzil/CURSOR.git**
 
 ## Tech Stack
 
