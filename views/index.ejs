@@ -1,0 +1,104 @@
+<%- include('partials/head', { title }) %>
+
+<section class="hero">
+  <h1>Kelas belajar bersama HMIF</h1>
+  <p class="lead">Check-In saat kelas dimulai, Check-Out saat kelas selesai. Modul bisa diunduh siapa saja setelah kelas ditandai selesai.</p>
+
+  <form class="filters" method="get" action="/" role="search">
+    <label class="field grow">
+      <span>Cari mata kuliah</span>
+      <input type="search" name="q" value="<%= q %>" placeholder="Contoh: Basis Data" maxlength="100">
+    </label>
+    <label class="field">
+      <span>Status kelas</span>
+      <select name="status">
+        <option value="">Semua status</option>
+        <% STATUS.forEach(function(s){ %>
+          <option value="<%= s %>" <%= status === s ? 'selected' : '' %>><%= s %></option>
+        <% }) %>
+      </select>
+    </label>
+    <button class="btn btn-primary" type="submit">Cari</button>
+    <% if (q || status) { %><a class="btn btn-ghost" href="/">Reset</a><% } %>
+  </form>
+</section>
+
+<% if (events.length === 0) { %>
+  <section class="empty">
+    <h2><%= (q || status) ? 'Tidak ada kelas yang cocok' : 'Belum ada kelas' %></h2>
+    <p><%= (q || status) ? 'Coba kata kunci lain atau hapus filter status.' : 'Jadwal kelas CURSOR akan muncul di sini setelah admin menambahkannya.' %></p>
+  </section>
+<% } else { %>
+  <p class="count" aria-live="polite"><%= events.length %> kelas ditampilkan</p>
+  <div class="grid">
+  <% events.forEach(function(e){ %>
+    <article class="card status-<%= statusClass(e.status) %>" id="kelas-<%= e.id %>">
+      <div class="card-head">
+        <span class="badge badge-<%= statusClass(e.status) %>"><span class="dot" aria-hidden="true"></span><%= e.status %></span>
+        <h2><%= e.mata_kuliah %></h2>
+      </div>
+
+      <dl class="meta">
+        <div><dt>Pengajar</dt><dd><%= e.pengajar %></dd></div>
+        <div><dt>Waktu</dt><dd><%= fmtWaktu(e.waktu) %></dd></div>
+        <div><dt>Ruang</dt><dd><%= e.ruang %></dd></div>
+        <div>
+          <dt>Peserta hadir</dt>
+          <dd>
+            <strong><%= e.hadir_penuh %></strong> hadir penuh
+            <% if (e.di_kelas > 0) { %><span class="muted">(<%= e.di_kelas %> masih di kelas)</span><% } %>
+          </dd>
+        </div>
+      </dl>
+
+      <div class="actions">
+        <% if (e.status === 'Berlangsung') { %>
+          <button class="btn btn-primary" type="button" data-open="ci-<%= e.id %>">Check-In</button>
+        <% } %>
+        <% if (e.status !== 'Belum Mulai') { %>
+          <button class="btn btn-outline" type="button" data-open="co-<%= e.id %>">Check-Out</button>
+        <% } %>
+
+        <% if (e.status === 'Selesai') { %>
+          <a class="btn btn-gold" href="/kelas/<%= e.id %>/modul">Download Modul</a>
+        <% } else { %>
+          <button class="btn btn-locked" type="button" disabled aria-disabled="true" title="Modul terbuka setelah kelas selesai">Download Modul (terkunci)</button>
+        <% } %>
+      </div>
+      <% if (e.status !== 'Selesai') { %><p class="hint">Modul terbuka untuk semua orang setelah admin menandai kelas Selesai.</p><% } %>
+
+      <% if (e.status === 'Berlangsung') { %>
+      <dialog id="ci-<%= e.id %>" aria-labelledby="ci-t-<%= e.id %>">
+        <form method="post" action="/kelas/<%= e.id %>/checkin" class="dlg">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <h3 id="ci-t-<%= e.id %>">Check-In: <%= e.mata_kuliah %></h3>
+          <label class="field"><span>Nama lengkap</span><input name="nama" required minlength="3" maxlength="100" autocomplete="name"></label>
+          <label class="field"><span>NIM</span><input name="nim" required inputmode="numeric" pattern="[0-9]{5,20}" maxlength="20" title="Angka 5–20 digit" autocomplete="off"></label>
+          <div class="dlg-actions">
+            <button class="btn btn-ghost" type="button" data-close>Batal</button>
+            <button class="btn btn-primary" type="submit">Check-In</button>
+          </div>
+        </form>
+      </dialog>
+      <% } %>
+
+      <% if (e.status !== 'Belum Mulai') { %>
+      <dialog id="co-<%= e.id %>" aria-labelledby="co-t-<%= e.id %>">
+        <form method="post" action="/kelas/<%= e.id %>/checkout" class="dlg">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <h3 id="co-t-<%= e.id %>">Check-Out: <%= e.mata_kuliah %></h3>
+          <label class="field"><span>NIM</span><input name="nim" required inputmode="numeric" pattern="[0-9]{5,20}" maxlength="20" autocomplete="off"></label>
+          <label class="field"><span>Kode Sesi</span><input name="kode_sesi" required maxlength="20" autocomplete="off" placeholder="Diumumkan pengajar di akhir kelas"></label>
+          <div class="dlg-actions">
+            <button class="btn btn-ghost" type="button" data-close>Batal</button>
+            <button class="btn btn-primary" type="submit">Check-Out</button>
+          </div>
+        </form>
+      </dialog>
+      <% } %>
+    </article>
+  <% }) %>
+  </div>
+<% } %>
+
+<%- include('partials/foot') %>

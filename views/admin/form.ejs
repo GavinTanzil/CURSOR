@@ -1,0 +1,29 @@
+<%- include('../partials/head', { title }) %>
+<section class="narrow wide">
+  <h1><%= title %></h1>
+  <% if (errors.length) { %>
+    <div class="flash flash-error" role="alert">
+      <strong>Data belum bisa disimpan:</strong>
+      <ul><% errors.forEach(function(er){ %><li><%= er %></li><% }) %></ul>
+    </div>
+  <% } %>
+  <form method="post" action="<%= action %>" class="panel form-grid">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label class="field span2"><span>Nama mata kuliah</span><input name="mata_kuliah" value="<%= v.mata_kuliah %>" required maxlength="100"></label>
+    <label class="field"><span>Nama pengajar</span><input name="pengajar" value="<%= v.pengajar %>" required maxlength="100"></label>
+    <label class="field"><span>Ruang kelas</span><input name="ruang" value="<%= v.ruang %>" required maxlength="50"></label>
+    <label class="field"><span>Tanggal dan jam</span><input type="datetime-local" name="waktu" value="<%= v.waktu %>" required></label>
+    <label class="field"><span>Kode sesi (untuk Check-Out)</span><input name="kode_sesi" value="<%= v.kode_sesi %>" required maxlength="20" pattern="[A-Za-z0-9_\-]{4,20}" title="4–20 karakter: huruf, angka, - atau _"></label>
+    <label class="field span2"><span>Link modul pembelajaran</span><input type="url" name="link_modul" value="<%= v.link_modul %>" required maxlength="500" placeholder="https://drive.google.com/..."></label>
+    <label class="field"><span>Status kelas</span>
+      <select name="status">
+        <% STATUS.forEach(function(s){ %><option value="<%= s %>" <%= v.status === s ? 'selected' : '' %>><%= s %></option><% }) %>
+      </select>
+    </label>
+    <div class="form-actions span2">
+      <a class="btn btn-ghost" href="/admin">Batal</a>
+      <button class="btn btn-primary" type="submit"><%= isEdit ? 'Simpan perubahan' : 'Tambah kelas' %></button>
+    </div>
+  </form>
+</section>
+<%- include('../partials/foot') %>

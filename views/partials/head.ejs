@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> – CURSOR HMIF</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<a class="skip" href="#konten">Lewati ke konten</a>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="/" aria-label="CURSOR, beranda">cursor<span class="caret" aria-hidden="true"></span></a>
+    <nav class="nav" aria-label="Navigasi utama">
+      <a href="/" <%- title === 'Daftar Kelas' ? 'aria-current="page"' : '' %>>Kelas</a>
+      <% if (isAdmin) { %>
+        <a href="/admin" <%- title === 'Dashboard Admin' ? 'aria-current="page"' : '' %>>Dashboard</a>
+        <form method="post" action="/admin/logout" class="inline">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <button class="linkbtn" type="submit">Keluar</button>
+        </form>
+      <% } else { %>
+        <a href="/admin/login">Admin</a>
+      <% } %>
+    </nav>
+  </div>
+</header>
+<main id="konten" class="wrap">
+<% if (flash) { %>
+  <div class="flash flash-<%= flash.type %>" role="<%= flash.type === 'error' ? 'alert' : 'status' %>"><%= flash.msg %></div>
+<% } %>

@@ -1,0 +1,74 @@
+<%- include('../partials/head', { title }) %>
+<div class="dash-head">
+  <h1>Dashboard admin</h1>
+  <a class="btn btn-primary" href="/admin/events/new">Tambah kelas</a>
+</div>
+
+<ul class="stats">
+  <li><strong><%= stats.total %></strong> kelas</li>
+  <li><strong><%= stats.live %></strong> berlangsung</li>
+  <li><strong><%= stats.done %></strong> selesai</li>
+  <li><strong><%= stats.hadir %></strong> total hadir penuh</li>
+</ul>
+
+<% if (events.length === 0) { %>
+  <section class="empty"><h2>Belum ada kelas</h2><p>Tambahkan jadwal kelas pertama untuk mulai menerima presensi.</p></section>
+<% } %>
+
+<% events.forEach(function(e){ %>
+<section class="admin-event" id="kelas-<%= e.id %>">
+  <div class="admin-row">
+    <div class="admin-main">
+      <span class="badge badge-<%= statusClass(e.status) %>"><span class="dot" aria-hidden="true"></span><%= e.status %></span>
+      <h2><%= e.mata_kuliah %></h2>
+      <p class="muted"><%= e.pengajar %>, <%= e.ruang %></p>
+      <p class="muted"><%= fmtWaktu(e.waktu) %></p>
+      <p class="muted">Kode sesi: <code><%= e.kode_sesi %></code></p>
+    </div>
+    <div class="admin-side">
+      <form method="post" action="/admin/events/<%= e.id %>/status" class="status-form">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <label class="field"><span>Status kelas</span>
+          <select name="status">
+            <% STATUS.forEach(function(s){ %><option value="<%= s %>" <%= e.status === s ? 'selected' : '' %>><%= s %></option><% }) %>
+          </select>
+        </label>
+        <button class="btn btn-outline" type="submit">Ubah</button>
+      </form>
+      <div class="row-actions">
+        <a class="btn btn-ghost" href="/admin/events/<%= e.id %>/edit">Edit</a>
+        <a class="btn btn-ghost" href="/admin/events/<%= e.id %>/export.csv">Unduh CSV</a>
+        <form method="post" action="/admin/events/<%= e.id %>/delete" data-confirm="Hapus kelas &quot;<%= e.mata_kuliah %>&quot; beserta seluruh data presensinya?">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <button class="btn btn-danger" type="submit">Hapus</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <details class="peserta" <%= e.peserta.length && e.status === 'Berlangsung' ? 'open' : '' %>>
+    <summary>Peserta: <%= e.di_kelas %> Check-In (belum Check-Out), <%= e.hadir_penuh %> hadir penuh</summary>
+    <% if (e.peserta.length === 0) { %>
+      <p class="muted pad">Belum ada peserta yang Check-In.</p>
+    <% } else { %>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>NIM</th><th>Nama</th><th>Status</th><th>Check-In</th><th>Check-Out</th></tr></thead>
+        <tbody>
+        <% e.peserta.forEach(function(p){ %>
+          <tr>
+            <td><%= p.nim %></td>
+            <td><%= p.nama %></td>
+            <td><% if (p.status === 'Hadir Penuh') { %><span class="chip chip-full">Hadir Penuh</span><% } else { %><span class="chip chip-in">Check-In (Belum Check-Out)</span><% } %></td>
+            <td><%= fmtTs(p.checkin_at) %></td>
+            <td><%= fmtTs(p.checkout_at) %></td>
+          </tr>
+        <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </details>
+</section>
+<% }) %>
+<%- include('../partials/foot') %>

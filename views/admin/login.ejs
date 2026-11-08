@@ -1,0 +1,12 @@
+<%- include('../partials/head', { title }) %>
+<section class="narrow">
+  <h1>Masuk admin</h1>
+  <p class="lead">Khusus panitia untuk mengelola jadwal, status kelas, dan melihat daftar hadir.</p>
+  <form method="post" action="/admin/login" class="panel">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label class="field"><span>Username</span><input name="username" required autocomplete="username" autofocus></label>
+    <label class="field"><span>Password</span><input type="password" name="password" required autocomplete="current-password"></label>
+    <button class="btn btn-primary" type="submit">Masuk</button>
+  </form>
+</section>
+<%- include('../partials/foot') %>
