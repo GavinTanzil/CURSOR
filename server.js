@@ -86,7 +86,6 @@ app.get('/', (req, res) => {
   res.render('index', { title: 'Daftar Kelas', events, q, status });
 });
 
-// Check-In (awal kelas)
 app.post('/kelas/:id/checkin', (req, res) => {
   const ev = getEvent(req.params.id);
   const back = `/#kelas-${req.params.id}`;
